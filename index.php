@@ -25,8 +25,6 @@ try {
 	$date = '';
 	$house = '';
 
-
-
 	//날짜 지정
 	if ($enterDate) {
 		$date = "enterdate LIKE '{$enterDate}%' ";
