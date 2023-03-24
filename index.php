@@ -6,37 +6,39 @@ require_once __DIR__ . '/inc/config.php';
 //변수 정리
 $arrRtn = array(
 	'code' => 500,
-	'msg' => ''
+	'msg'  => ''
 );
 
 try {
 
 	//검색어
-	$sensorSerial = isset($_POST['sensorSerial']) ? $_POST['sensorSerial'] : '';
-	$enterDate = isset($_POST['enterDate']) ? $_POST['enterDate'] : '';
-
+	$sensorSerial = isset( $_POST['sensor'] ) ? $_POST['sensor'] : '';
+	$month    = isset( $_POST['month'] ) ? $_POST['month'] : 0;
+	
 	//변수 초기화
-	$where = '';
-	$max = '';
-	$min = '';
-	$avg = '';
-	$calcQuery = '';
+	$where       = '';
+	$max         = '';
+	$min         = '';
+	$avg         = '';
+	$calcQuery   = '';
 	$calc_result = '';
-	$date = '';
-	$house = '';
+	$date        = '';
+	$house       = '';
+	$enterdate	 = '2023-';
 
 	//날짜 지정
-	if ($enterDate) {
-		$date = "enterdate LIKE '{$enterDate}%' ";
+	if ($month > 0) {
+		$enterdate = $enterdate .$month;
+		$date = "AND enterdate LIKE '{$enterdate}%' ";
 	}
 
 	//농가번호 지정
-	$sensorSerial = $_mysqli->real_escape_string($sensorSerial);
+	$sensorSerial = $_mysqli->real_escape_string( $sensorSerial );
 	if ($sensorSerial) {
-		$house = "AND sensorSerial = '{$sensorSerial}' ";
+		$house = "sensorSerial = '{$sensorSerial}' ";
 	}
 
-	$where .= $date . $house;
+	$where .=  $house.$date;
 
 	//echo $where;
 
@@ -46,33 +48,35 @@ try {
 			FROM envdata
 			WHERE {$where}
 			";
-		$query = "SELECT * FROM envdata WHERE {$where}";
+		$query     = "SELECT * FROM envdata WHERE {$where} ORDER BY serial ASC";
 	} else {
 		//DB 조회
-		$query = "SELECT * FROM envdata";
+		$query = "SELECT * FROM envdata ORDER BY serial desc limit 50";
+
 	}
 
 
 	if ($calcQuery) {
-		$calc_result = $_mysqli->query($calcQuery);
+		$calc_result = $_mysqli->query( $calcQuery );
 	}
 
-	$db_result = $_mysqli->query($query);
+	$db_result = $_mysqli->query( $query );
+
 
 	//검색 발생시
 	if ($calcQuery) {
 		if (!$calc_result) {
 			$code = 502;
-			$msg = "조회 중 오류가 발생했습니다.(code {$code})\n관리자에게 문의해 주세요.";
-			throw new mysqli_sql_exception($msg, $code);
+			$msg  = "조회 중 오류가 발생했습니다.(code {$code})\n관리자에게 문의해 주세요.";
+			throw new mysqli_sql_exception( $msg, $code );
 		}
 	}
 
 	//DB 조회(검색x)
 	if (!$db_result) {
 		$code = 502;
-		$msg = "조회 중 오류가 발생했습니다.(code {$code})\n관리자에게 문의해 주세요.";
-		throw new mysqli_sql_exception($msg, $code);
+		$msg  = "조회 중 오류가 발생했습니다.(code {$code})\n관리자에게 문의해 주세요.";
+		throw new mysqli_sql_exception( $msg, $code );
 	}
 
 	//DB 데이터 행 조회
@@ -85,13 +89,13 @@ try {
 
 } catch (mysqli_sql_exception $e) {
 	$arrRtn['code'] = $e->getCode();
-	$arrRtn['msg'] = $e->getMessage();
-	echo json_encode($arrRtn);
+	$arrRtn['msg']  = $e->getMessage();
+	echo json_encode( $arrRtn );
 
 } catch (Exception $e) {
 	$arrRtn['code'] = $e->getCode();
-	$arrRtn['msg'] = $e->getMessage();
-	echo json_encode($arrRtn);
+	$arrRtn['msg']  = $e->getMessage();
+	echo json_encode( $arrRtn );
 } finally {
 }
 ?>
@@ -127,33 +131,39 @@ try {
 
 	<body>
 		<h1>envData</h1><br />
-		<!-- 리스트 (전체)조회 -->
-		<div>
-			<form id="envForm" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-				<fieldset class="select_filedset">
-					<div class="">
-						<button style="margin-left: 1px;" type="button" onclick="selectEnv()"
-							class="btn btn-outline-dark" title="검색버튼" label="검색버튼">전체 조회</button>
-					</div>
-				</fieldset>
-			</form>
-		</div>
-		<!-- .리스트 조회 -->
 		<!-- 검색 -->
 		<div>
 			<form id="envSearchForm" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-				<fieldset class="select_filedset">
+				<fieldset class="select_date">
 					<div class="">
-						<input type="date" name="enterDate" id="enterDate" /><br />
-						<label for=""><strong>하우스:</strong></label>
-						<select name="sensorSerial" id="sensorSerial">
-							<option value="">선택</option>
-							<option value="38">이광재님</option>
-							<option value="39">김창열님</option>
-							<option value="999">테스트</option>
+						<label for="month"><strong>기간</strong></label>
+						<select name="month" id="month">
+							<option value="0" selected >선택</option>
+							<option value="01">1월</option>
+							<option value="02">2월</option>
+							<option value="03">3월</option>
+							<option value="04">4월</option>
+							<option value="05">5월</option>
+							<option value="06">6월</option>
+							<option value="07">7월</option>
+							<option value="08">8월</option>
+							<option value="09">9월</option>
+							<option value="10">10월</option>
+							<option value="11">11월</option>
+							<option value="12">12월</option>							
 						</select>
-						<button style="margin-left: 1px;" type="button" onclick="searchEnv()"
-							class="btn btn-outline-primary" title="검색버튼" label="검색버튼">검색</button>
+					</div>
+				</fieldset>
+				<fieldset class="select_house">
+					<div class="">
+						<label for="house"><strong>하우스:</strong></label>
+						<select name="sensor" id="sensor">
+							<option value="0" >선택</option>
+							<option value="38" >이광재님</option>
+							<option value="39">김창열님</option>
+						</select>
+						<button style="margin-left: 1px;" type="button" onclick="searchEnv()" class="btn btn-outline-primary" title="검색버튼" label="검색버튼">검색</button>
+						<button type="button" onclick="selectAll()" class="btn btn-outline-danger" title="리셋버튼" label="검색버튼">리셋</button>
 					</div>
 				</fieldset>
 			</form>
@@ -162,10 +172,10 @@ try {
 		<div>
 			<?php if ($calc_result && $dbDataRows) {
 				$calcData = $calc_result->fetch_array();
-				$min = $calcData['min'];
-				$max = $calcData['max'];
-				$avg = $calcData['avg'];
-				$avg = sprintf('%0.2f', $avg);
+				$min      = $calcData['min'];
+				$max      = $calcData['max'];
+				$avg      = $calcData['avg'];
+				$avg      = sprintf( '%0.2f', $avg );
 			}
 			if ($min || $max || $avg) {
 				?>
@@ -216,15 +226,15 @@ try {
 				</thead>
 				<tbody>
 					<?php
-					//댓글 리스트
+					// 리스트
 					if ($dbDataRows > 0) {
 						$no = 1;
-						while ($envData = $db_result->fetch_array()) {
+						while ( $envData = $db_result->fetch_array() ) {
 							//변수 정리
 							$envSerial = $envData['serial'];
 							$envSensor = $envData['sensorSerial'];
-							$envValue = $envData['val'];
-							$envDate = $envData['enterdate'];
+							$envValue  = $envData['val'];
+							$envDate   = $envData['enterdate'];
 							?>
 							<tr>
 								<td>
@@ -255,42 +265,9 @@ try {
 				</tbody>
 			</table>
 		</div>
-
 		<footer style="margin: 5em;">
 		</footer>
 	</body>
 
-	</html>
-
-	<script>
-		function selectEnv() {
-			envForm = document.getElementById('envForm');
-			envForm.submit();
-		}
-
-		function searchEnv() {
-			var enterDate = document.getElementById('enterDate').value;
-			var house = document.getElementById('sensorSerial').value;
-			if (enterDate == '') {
-				alert('날짜를 선택하세요!!');
-				return false;
-			}
-			if (house == '') {
-				alert('하우스를 선택하세요!!');
-				return false;
-			}
-
-			envSearchForm = document.getElementById('envSearchForm');
-			envSearchForm.submit();
-		}
-
-		//postData
-		let selectHouse = document.getElementById('sensorSerial');
-		let selectDate = document.getElementById('enterDate');
-
-		let selectHouseVal = '<?php echo $sensorSerial; ?>';
-		let selectDateVal = '<?php echo $enterDate; ?>';
-
-		selectHouse.value = selectHouseVal;
-		selectDate.value = selectDateVal;
-	</script>
+	</html>	
+	<script src="./assets/js/myScript.js" defer></script>
