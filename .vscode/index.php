@@ -33,9 +33,33 @@ try {
 	}
 
 	//농가번호 지정
+	switch ($sensorSerial) {
+		case "set1":
+			$sensorSerial = "";
+			break;
+		case "set2":
+			$sensorSerial = "";
+			break;
+		case "set3":
+			$sensorSerial = "";
+			break;
+		case "set4":
+			$sensorSerial = "";
+			break;
+		case "set5":
+			$sensorSerial = "";
+			break;
+		case "set6":
+			$sensorSerial = "";
+			break;
+		case "set7":
+			$sensorSerial = "";
+			break;
+	}
+
 	$sensorSerial = $_mysqli->real_escape_string( $sensorSerial );
 	if ($sensorSerial) {
-		$house = "sensorSerial = '{$sensorSerial}' ";
+		$house = "sensorSerial = IN('{$sensorSerial}') ";
 	}
 
 	$where .= $house . $date;
@@ -159,8 +183,15 @@ try {
                         <label for="house"><strong>하우스:</strong></label>
                         <select name="sensor" id="sensor">
                             <option value="0">선택</option>
-                            <option value="38">이광재님</option>
-                            <option value="39">김창열님</option>
+                            <option value="38">이광재님 온도</option>
+                            <option value="39">김창열님 온도</option>
+                            <option value="set1">사과노지 온도</option>
+                            <option value="set2">사과노지 습도</option>
+                            <option value="set3">포도13동 습도</option>
+                            <option value="set4">포도14동 습도</option>
+                            <option value="set5">대추하우스 습도</option>
+                            <option value="set6">산초하우스 습도</option>
+                            <option value="set7">아스파라거스 습도</option>
                         </select>
                         <button style="margin-left: 1px;" type="button" onclick="searchEnv()"
                             class="btn btn-outline-primary" title="검색버튼" label="검색버튼">검색</button>
