@@ -13,8 +13,8 @@ try {
 
 	//검색어
 	$sensorSerial = isset( $_POST['sensor'] ) ? $_POST['sensor'] : '';
-	$month    = isset( $_POST['month'] ) ? $_POST['month'] : 0;
-	
+	$month        = isset( $_POST['month'] ) ? $_POST['month'] : 0;
+
 	//변수 초기화
 	$where       = '';
 	$max         = '';
@@ -24,21 +24,45 @@ try {
 	$calc_result = '';
 	$date        = '';
 	$house       = '';
-	$enterdate	 = '2023-';
+	$enterdate   = '2023-';
 
 	//날짜 지정
 	if ($month > 0) {
-		$enterdate = $enterdate .$month;
-		$date = "AND enterdate LIKE '{$enterdate}%' ";
+		$enterdate = $enterdate . $month;
+		$date      = "AND enterdate LIKE '{$enterdate}%' ";
 	}
 
 	//농가번호 지정
-	$sensorSerial = $_mysqli->real_escape_string( $sensorSerial );
-	if ($sensorSerial) {
-		$house = "sensorSerial = '{$sensorSerial}' ";
+	switch ($sensorSerial) {
+		case "set1":
+			$sensorSerial = "";
+			break;
+		case "set2":
+			$sensorSerial = "";
+			break;
+		case "set3":
+			$sensorSerial = "";
+			break;
+		case "set4":
+			$sensorSerial = "";
+			break;
+		case "set5":
+			$sensorSerial = "";
+			break;
+		case "set6":
+			$sensorSerial = "";
+			break;
+		case "set7":
+			$sensorSerial = "";
+			break;
 	}
 
-	$where .=  $house.$date;
+	$sensorSerial = $_mysqli->real_escape_string( $sensorSerial );
+	if ($sensorSerial) {
+		$house = "sensorSerial = IN('{$sensorSerial}') ";
+	}
+
+	$where .= $house . $date;
 
 	//echo $where;
 
@@ -101,76 +125,85 @@ try {
 ?>
 
 <!DOCUTYPE html>
-	<html lang="ko">
+    <html lang="ko">
 
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-		<link href="" rel="stylesheet">
-		<style>
-			body {
-				margin-left: 10px;
-			}
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <link href="" rel="stylesheet">
+        <style>
+        body {
+            margin-left: 10px;
+        }
 
-			table,
-			th,
-			td {
-				border: 1px solid;
-			}
+        table,
+        th,
+        td {
+            border: 1px solid;
+        }
 
-			th,
-			td {
-				text-align: center;
-				padding: 10px;
-			}
-		</style>
-		<title>.</title>
+        th,
+        td {
+            text-align: center;
+            padding: 10px;
+        }
+        </style>
+        <title>.</title>
 
-	<body>
-		<h1>envData</h1><br />
-		<!-- 검색 -->
-		<div>
-			<form id="envSearchForm" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-				<fieldset class="select_date">
-					<div class="">
-						<label for="month"><strong>기간</strong></label>
-						<select name="month" id="month">
-							<option value="0" selected >선택</option>
-							<option value="01">1월</option>
-							<option value="02">2월</option>
-							<option value="03">3월</option>
-							<option value="04">4월</option>
-							<option value="05">5월</option>
-							<option value="06">6월</option>
-							<option value="07">7월</option>
-							<option value="08">8월</option>
-							<option value="09">9월</option>
-							<option value="10">10월</option>
-							<option value="11">11월</option>
-							<option value="12">12월</option>							
-						</select>
-					</div>
-				</fieldset>
-				<fieldset class="select_house">
-					<div class="">
-						<label for="house"><strong>하우스:</strong></label>
-						<select name="sensor" id="sensor">
-							<option value="0" >선택</option>
-							<option value="38" >이광재님</option>
-							<option value="39">김창열님</option>
-						</select>
-						<button style="margin-left: 1px;" type="button" onclick="searchEnv()" class="btn btn-outline-primary" title="검색버튼" label="검색버튼">검색</button>
-						<button type="button" onclick="selectAll()" class="btn btn-outline-danger" title="리셋버튼" label="검색버튼">리셋</button>
-					</div>
-				</fieldset>
-			</form>
-		</div>
-		<!-- .검색 -->
-		<div>
-			<?php if ($calc_result && $dbDataRows) {
+    <body>
+        <h1>envData</h1><br />
+        <!-- 검색 -->
+        <div>
+            <form id="envSearchForm" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                <fieldset class="select_date">
+                    <div class="">
+                        <label for="month"><strong>기간</strong></label>
+                        <select name="month" id="month">
+                            <option value="0" selected>선택</option>
+                            <option value="01">1월</option>
+                            <option value="02">2월</option>
+                            <option value="03">3월</option>
+                            <option value="04">4월</option>
+                            <option value="05">5월</option>
+                            <option value="06">6월</option>
+                            <option value="07">7월</option>
+                            <option value="08">8월</option>
+                            <option value="09">9월</option>
+                            <option value="10">10월</option>
+                            <option value="11">11월</option>
+                            <option value="12">12월</option>
+                        </select>
+                    </div>
+                </fieldset>
+                <fieldset class="select_house">
+                    <div class="">
+                        <label for="house"><strong>하우스:</strong></label>
+                        <select name="sensor" id="sensor">
+                            <option value="0">선택</option>
+                            <option value="38">이광재님 온도</option>
+                            <option value="39">김창열님 온도</option>
+                            <option value="set1">사과노지 온도</option>
+                            <option value="set2">사과노지 습도</option>
+                            <option value="set3">포도13동 습도</option>
+                            <option value="set4">포도14동 습도</option>
+                            <option value="set5">대추하우스 습도</option>
+                            <option value="set6">산초하우스 습도</option>
+                            <option value="set7">아스파라거스 습도</option>
+                        </select>
+                        <button style="margin-left: 1px;" type="button" onclick="searchEnv()"
+                            class="btn btn-outline-primary" title="검색버튼" label="검색버튼">검색</button>
+                        <button type="button" onclick="selectAll()" class="btn btn-outline-danger" title="리셋버튼"
+                            label="검색버튼">리셋</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <!-- .검색 -->
+        <div>
+            <?php if ($calc_result && $dbDataRows) {
 				$calcData = $calc_result->fetch_array();
 				$min      = $calcData['min'];
 				$max      = $calcData['max'];
@@ -179,53 +212,53 @@ try {
 			}
 			if ($min || $max || $avg) {
 				?>
-				<table class="" id="">
-					<thead>
-						<tr>
-							<th>농가 번호</th>
-							<th>최저 온도</th>
-							<th>최고 온도</th>
-							<th>평균 온도</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>
-								<?php echo $sensorSerial; ?>
-							</td>
-							<td>
-								<?php echo $min; ?>
-							</td>
-							<td>
-								<?php echo $max; ?>
-							</td>
-							<td>
-								<?php echo $avg; ?>
-							</td>
-						</tr>
-					</tbody>
-				</table><br />
-			<?php }
+            <table class="" id="">
+                <thead>
+                    <tr>
+                        <th>농가 번호</th>
+                        <th>최저 온도</th>
+                        <th>최고 온도</th>
+                        <th>평균 온도</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <?php echo $sensorSerial; ?>
+                        </td>
+                        <td>
+                            <?php echo $min; ?>
+                        </td>
+                        <td>
+                            <?php echo $max; ?>
+                        </td>
+                        <td>
+                            <?php echo $avg; ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table><br />
+            <?php }
 			; ?>
-		</div>
-		<div class="" style="" ;>
-			<table class="" id="">
-				<colgroup>
-				</colgroup>
-				<thead>
-					<?php
+        </div>
+        <div class="" style="" ;>
+            <table class="" id="">
+                <colgroup>
+                </colgroup>
+                <thead>
+                    <?php
 					if ($dbDataRows > 0) { ?>
-						<tr>
-							<th>No</th>
-							<th>데이터 번호</th>
-							<th>농가번호</th>
-							<th>값</th>
-							<th>날짜</th>
-						</tr>
-					<?php } ?>
-				</thead>
-				<tbody>
-					<?php
+                    <tr>
+                        <th>No</th>
+                        <th>데이터 번호</th>
+                        <th>농가번호</th>
+                        <th>값</th>
+                        <th>날짜</th>
+                    </tr>
+                    <?php } ?>
+                </thead>
+                <tbody>
+                    <?php
 					// 리스트
 					if ($dbDataRows > 0) {
 						$no = 1;
@@ -236,38 +269,38 @@ try {
 							$envValue  = $envData['val'];
 							$envDate   = $envData['enterdate'];
 							?>
-							<tr>
-								<td>
-									<?php echo $no; ?>
-								</td>
-								<td>
-									<?php echo $envSerial; ?>
-								</td>
-								<td>
-									<?php echo $envSensor; ?>
-								</td>
-								<td>
-									<?php echo $envValue; ?>
-								</td>
-								<td>
-									<?php echo $envDate; ?>
-								</td>
-							</tr>
-							<?php $no++;
+                    <tr>
+                        <td>
+                            <?php echo $no; ?>
+                        </td>
+                        <td>
+                            <?php echo $envSerial; ?>
+                        </td>
+                        <td>
+                            <?php echo $envSensor; ?>
+                        </td>
+                        <td>
+                            <?php echo $envValue; ?>
+                        </td>
+                        <td>
+                            <?php echo $envDate; ?>
+                        </td>
+                    </tr>
+                    <?php $no++;
 						}
 					} else {
 						?>
-						<tr>
-							<td colspan="4"><strong>해당 하우스의 데이터가 없습니다.</strong></td>
-						</tr>
-						<?php
+                    <tr>
+                        <td colspan="4"><strong>해당 하우스의 데이터가 없습니다.</strong></td>
+                    </tr>
+                    <?php
 					} ?>
-				</tbody>
-			</table>
-		</div>
-		<footer style="margin: 5em;">
-		</footer>
-	</body>
+                </tbody>
+            </table>
+        </div>
+        <footer style="margin: 5em;">
+        </footer>
+    </body>
 
-	</html>	
-	<script src="./assets/js/myScript.js" defer></script>
+    </html>
+    <script src="./assets/js/myScript.js" defer></script>
