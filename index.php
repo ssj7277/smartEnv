@@ -3,6 +3,7 @@
 //config
 require_once __DIR__ . '/inc/config.php';
 
+
 //변수 정리
 $arrRtn = array(
     'code' => 500,
@@ -26,6 +27,14 @@ try {
     $total_pages   = '';
     $total_records = '';
     $sensorSerial  = '';
+
+    //평균 변수 초기화
+    $calc_query  = '';
+    $calc_result = '';
+    $min         = '';
+    $max         = '';
+    $avg         = '';
+
 
     $enterdate = '2023-';
 
@@ -83,9 +92,16 @@ try {
     }
 
     if ($sensorSerial) {
-        $where = "WHERE sensorSerial IN( '{$sensorSerial}' ) ";
-    } else
+        $where      = "WHERE sensorSerial IN( '{$sensorSerial}' ) ";
+        $calc_query = "
+        SELECT MAX(val) AS max, MIN(val) AS min, AVG(val) AS avg
+        FROM envdata {$where}" . "$date
+        ";
+        //echo $calc_query;
+        $calc_result = $_mysqli->query( $calc_query );
+    } else {
         $where = "WHERE sensorSerial IN(38) ";
+    }
     $where .= $date;
 
     //paging query
@@ -140,69 +156,10 @@ try {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <link href="" rel="stylesheet">
+        <script src="./assets/js/myScript.js" defer></script>
+        <link href="./assets/css/style.css" type="text/css" rel="stylesheet">
         <style>
-        body {
-            margin-left: 10px;
-        }
 
-        table {
-            border: 1px solid;
-            text-align: center;
-            width: 650px;
-        }
-
-        th {
-            border: 1px solid;
-        }
-
-        thead {
-            background-color: springgreen;
-            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-            height: 50px;
-        }
-
-        tbody {}
-
-        td {
-            border: 1px solid;
-            padding: 10px;
-            font-family: Arial, sans-serif;
-        }
-
-        .pagination li:not(:last-child) {
-            margin-right: 5px;
-        }
-
-        .selectSize {
-            width: 240px;
-            margin-bottom: 10px;
-            display: inline;
-            font-size: 20px;
-        }
-
-        .labelMonth {
-            color: mediumslateblue;
-            font-size: 30px;
-        }
-
-        .labelHouse {
-            color: midnightblue;
-            font-size: 30px;
-        }
-
-        #topMove {
-            margin-top: 10px;
-            margin-left: 590px;
-        }
-
-        .inline {
-            display: inline;
-        }
-
-        .tum {
-            margin-left: 170px;
-        }
         </style>
         <title>.</title>
 
@@ -260,7 +217,45 @@ try {
         </div>
         <!-- .검색 -->
         <!-- calc data -->
-
+        <div>
+            <?php if ($calc_result) {
+                $calcData = $calc_result->fetch_array();
+                $min      = $calcData['min'];
+                $max      = $calcData['max'];
+                $avg      = $calcData['avg'];
+                $avg      = sprintf( '%0.2f', $avg );
+            }
+            if ($min || $max) {
+                ?>
+            <table class="calcTable" id="">
+                <thead>
+                    <tr>
+                        <th>농가 번호</th>
+                        <th>최저 온도</th>
+                        <th>최고 온도</th>
+                        <th>평균 온도</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <?php echo $house; ?>
+                        </td>
+                        <td>
+                            <?php echo $min; ?>
+                        </td>
+                        <td>
+                            <?php echo $max; ?>
+                        </td>
+                        <td>
+                            <?php echo $avg; ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table><br />
+            <?php }
+            ; ?>
+        </div>
         <!-- .calc data -->
         <div>
             <div style="margin-bottom: 10px;">
@@ -285,7 +280,6 @@ try {
                                 echo "<li><a href='?page=$i&sensor=$sensor&month=$month'><button type='button' class='btn btn-outline-secondary'>$i</button></a></li>";
                             }
                         }
-
                         if ($current_block < ceil( $total_pages / 5 )) {
                             $next_page = $end_page + 1;
                             echo "<li><a href='index.php?page=$next_page&sensor=$sensor&month=$month'><button type='button' class='btn btn-outline-primary'>다음</button></a></li>";
@@ -294,7 +288,7 @@ try {
                     </ul>
                 </div>
             </div>
-            <table>
+            <table class="dataTable" id="">
                 <colgroup>
                 </colgroup>
                 <thead>
@@ -354,4 +348,3 @@ try {
     </body>
 
     </html>
-    <script src="./assets/js/myScript.js" defer></script>

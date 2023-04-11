@@ -1,0 +1,67 @@
+body {
+    margin-left: 10px;
+}
+
+table {
+    border: 1px solid;
+    text-align: center;
+    width: 650px;
+}
+
+th {
+    border: 1px solid;
+}
+
+thead {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    height: 50px;
+}
+
+
+td {
+    border: 1px solid;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.dataTable thead {
+    background-color: springgreen;
+}
+
+.calcTable thead {
+    background-color: cornflowerblue;
+}
+
+.pagination li:not(:last-child) {
+    margin-right: 5px;
+}
+
+.selectSize {
+    width: 240px;
+    margin-bottom: 10px;
+    display: inline;
+    font-size: 20px;
+}
+
+.labelMonth {
+    color: mediumslateblue;
+    font-size: 30px;
+}
+
+.labelHouse {
+    color: midnightblue;
+    font-size: 30px;
+}
+
+#topMove {
+    margin-top: 10px;
+    margin-left: 590px;
+}
+
+.inline {
+    display: inline;
+}
+
+.tum {
+    margin-left: 170px;
+}
